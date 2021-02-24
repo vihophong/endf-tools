@@ -155,7 +155,7 @@ def getdata(infile):
 							ival+=1
 
 	if ispec > 0:
-		specall.append({"stype": stype,"s":spec})
+		specall.append({"stype": stype,"spec":spec})
 		Z = int(round(za))/1000
 		A = int(round(za))-Z*1000
 		endf.append({"input": infile, "Z":Z, "A":A, "za": za, "awr": awr, "lis": lis, "liso": liso, "nst": nst,
@@ -215,8 +215,11 @@ def writebin(input, output):
 def load_bin(infile):
 	return np.load(infile,allow_pickle='TRUE')
 
+
 #writebin("listfiles.txt","all_beta_specs")
 endf_neuspecs = load_bin("all_beta_specs.npy")
 
-for index in range(len(endf_neuspecs)):
-	print endf_neuspecs[index]["Z"],endf_neuspecs[index]["A"],endf_neuspecs[index]["qbn"][0]/1000
+for index in range(len(endf)):
+			for ip in range(len(endf[index]["specs"])):
+				if endf[index]["specs"][ip]["stype"] == "n":
+					print endf[index]["specs"][ip]["spec"]
