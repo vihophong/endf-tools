@@ -249,14 +249,16 @@ for index in range(len(endf_neuspecs)):
 					val=np.zeros(len(endf_neuspecs[index]["specs"][ip]["spec"]))
 					dval=np.zeros(len(endf_neuspecs[index]["specs"][ip]["spec"]))
 					for ips in range(len(endf_neuspecs[index]["specs"][ip]["spec"])):
-						val[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["val"]))
+						val[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["val"]))/1000000
 						dval[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["dval"]))
 						
 					if len(endf_neuspecs[index]["specs"][ip]["spec"])>0:
-						output_file = TFile.Open("specs/"+getnamebyz(int(endf_neuspecs[index]["Z"])).capitalize()+str(endf_neuspecs[index]["A"])+".root", 'recreate')
+						filename="specs/"+getnamebyz(int(endf_neuspecs[index]["Z"])).capitalize()+str(endf_neuspecs[index]["A"])+".root"
+						output_file = TFile.Open(filename, 'recreate')
 						h1 = TH1F("hSpecRebin","hSpecRebin",len(endf_neuspecs[index]["specs"][ip]["spec"])-1,val)
 						for ii in range(len(endf_neuspecs[index]["specs"][ip]["spec"])-1):
 							h1.SetBinContent(ii+1,dval[ii])
 						h1.Scale(1/h1.Integral())
 						h1.Write()
 						output_file.Close()
+						print "./neueff_from_spec.sh endf-tools/"+filename+" hSpecRebin upc_brikenV69_wClover.txt "+str(endf_neuspecs[index]["qbn"][0]/1000000)

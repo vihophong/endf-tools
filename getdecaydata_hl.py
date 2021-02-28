@@ -151,14 +151,32 @@ def load_bin(infile):
 	return np.load(infile,allow_pickle='TRUE')
 
 
-writebin("listfiles.txt","all_beta_specs_hlonly")
+#writebin("listfiles.txt","all_beta_specs_hlonly")
 #endf_neuspecs = load_bin("all_beta_specs.npy")
 
-endf_neuspecs = getneuspec("listfiles.txt")
-count = 0
+#endf_neuspecs = getneuspec("listfiles.txt")
+#count = 0
+# for index in range(len(endf_neuspecs)):
+# 	if (endf_neuspecs[index]["nst"]==0 and endf_neuspecs[index]["dt12"]>0):
+# 		print endf_neuspecs[index]["Z"],endf_neuspecs[index]["A"],endf_neuspecs[index]["t12"],endf_neuspecs[index]["dt12"]
+# 		count+=1
+
+# print count,len(endf_neuspecs)
+
+endf_neuspecs = load_bin("all_beta_specs_hlonly.npy")
+
+from ROOT import TTree, TFile, TH2F
+x1 = 0; x2 = 240
+y1 = 0; y2 = 115
+nx = x2-x1
+ny = y2-y1
+
+output_file = TFile.Open("halflives.root", 'recreate')
+h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
 for index in range(len(endf_neuspecs)):
 	if (endf_neuspecs[index]["nst"]==0 and endf_neuspecs[index]["dt12"]>0):
-		print endf_neuspecs[index]["Z"],endf_neuspecs[index]["A"],endf_neuspecs[index]["t12"],endf_neuspecs[index]["dt12"]
-		count+=1
+		h2.Fill(endf_neuspecs[index]["A"]-endf_neuspecs[index]["Z"],endf_neuspecs[index]["Z"],endf_neuspecs[index]["t12"])
+		h2.SetBinError(endf_neuspecs[index]["A"]-endf_neuspecs[index]["Z"]+1,endf_neuspecs[index]["Z"]+1,endf_neuspecs[index]["dt12"])
 
-print count,len(endf_neuspecs)
+h2.Write()
+output_file.Close()
