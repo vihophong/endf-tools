@@ -2,6 +2,7 @@
 import struct
 import numpy as np
 import re
+from array import array
 
 ensdf = []
 ensdfstable = []
@@ -182,33 +183,50 @@ def duplicateoutstable():
 
 	return curr_data
 
-# from ROOT import TTree, TFile, TH2F
-# def writerootfile(inp,outp):
-# 	x1 = 0; x2 = 240
-# 	y1 = 0; y2 = 115
-# 	nx = x2-x1
-# 	ny = y2-y1
-# 	ensdf_clean = load_bin(inp)
-# 	output_file = TFile.Open(outp, 'recreate')
-# 	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
-# 	for index in range(len(ensdf_clean)):
-# 		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
-# 		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
-# 	h2.Write()
-# 	output_file.Close()
+from ROOT import TTree, TFile, TH2F, TGraph
+def writerootfile(inp,inpstable,outp):
+	x1 = 0; x2 = 200
+	y1 = 0; y2 = 120
+	nx = x2-x1
+	ny = y2-y1
+	ensdf_clean = load_bin(inp)
+	ensdfstable_clean = load_bin(inpstable)
+	output_file = TFile.Open(outp, 'recreate')
+	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
+	h2stable = TH2F("stable","stable",nx,x1,x2,ny,y1,y2)
+
+	np = 0
+	xx,yy = array('d'),array('d')
+	for index in range(len(ensdf_clean)):
+		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
+		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
+	for index in range(len(ensdfstable_clean)):
+		h2stable.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1.)
+		xx.append(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"]+0.5)
+		yy.append(ensdfstable_clean[index]["Z"]+0.5)
+		np+=1
+	gr = TGraph(np,xx,yy)
+	gr.SetName("stablegr")
+	gr.SetMarkerStyle(21)
+	gr.SetMarkerColor(1)
+	gr.SetMarkerSize(1)
+	h2.Write()
+	h2stable.Write()
+	gr.Write()
+	output_file.Close()
 
 
-get_mult_data("list1.txt")
-get_mult_data("list2.txt")
-get_mult_data("list3.txt")
-print len(ensdf)
-ensdf_clean = duplicateout()
-print len(ensdf_clean)
-writebin("ensdfdata_t12.npy",ensdf_clean)
-print "----"
-print len(ensdfstable)
-ensdfstable_clean = duplicateoutstable()
-print len(ensdfstable_clean)
-writebin("ensdfdata_stable_t12.npy",ensdfstable_clean)
+# get_mult_data("list1.txt")
+# get_mult_data("list2.txt")
+# get_mult_data("list3.txt")
+# print len(ensdf)
+# ensdf_clean = duplicateout()
+# print len(ensdf_clean)
+# writebin("ensdfdata_t12.npy",ensdf_clean)
+# print "----"
+# print len(ensdfstable)
+# ensdfstable_clean = duplicateoutstable()
+# print len(ensdfstable_clean)
+# writebin("ensdfdata_stable_t12.npy",ensdfstable_clean)
 
-#writerootfile("ensdfdata_t12.npy","halflives.root")
+writerootfile("ensdfdata_t12.npy","ensdfdata_stable_t12.npy","halflives.root")
