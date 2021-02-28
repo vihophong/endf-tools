@@ -98,7 +98,7 @@ def getdata(infile):
 				w6float = float(w6.strip())
 			except:
 				w6float = -1
-			if (w6float == 0 or w6.strip() == "0.0+X" or w6.strip() == "0+X"):
+			if (w6float == 0 or w6.strip() == "0.0+X" or w6.strip() == "0+X" or w6.strip() == "0+V" or w6.strip() == "0.0+V" or w6.strip() == "X"):
 				isstable = False
 				if (w9.strip()=="STABLE"):
 					isstable = True
