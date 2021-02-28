@@ -4,6 +4,7 @@ import numpy as np
 import re
 
 ensdf = []
+ensdfstable = []
 
 findees = ['Y','D','H','M','S','MS','US','NS','PS','FS','AS']
 units = {'Y': 365.2422*24*60*60, 'D': 24*60*60, 'H': 60*60, 'M': 60, 'S':1, 'MS': 1e-3, 'US': 1e-6, 'NS': 1e-9, 'PS': 1e-12, 'FS': 1e-15, 'AS': 1e-18}	
@@ -98,11 +99,14 @@ def getdata(infile):
 				w6float = float(w6.strip())
 			except:
 				w6float = -1
-			if (w6float == 0 or w6.strip() == "0.0+X" or w6.strip() == "0+X" or w6.strip() == "0+V" or w6.strip() == "0.0+V" or w6.strip() == "X"):
+			if (w6float == 0 or w6.strip() == "0.0+X" or w6.strip() == "0+X" or w6.strip() == "0+V" or w6.strip() == "0.0+V" or w6.strip() == "X" or w6.strip() == "Y"):
 				isstable = False
 				if (w9.strip()=="STABLE"):
 					isstable = True
 					#print "Stable",w1.strip()
+					Astable = getA(w1.strip().lower())
+					Zstable = getZ(w1.strip().lower())
+					ensdfstable.append({"input": infile, "Z":Zstable, "A":Astable, "nuc": w1.strip().lower()})
 				else:
 					if (w10.strip()!=""):
 						tmpt12 = w9.strip().split()
@@ -166,28 +170,45 @@ def duplicateout():
 
 	return curr_data
 
-from ROOT import TTree, TFile, TH2F
-def writerootfile(inp,outp):
-	x1 = 0; x2 = 240
-	y1 = 0; y2 = 115
-	nx = x2-x1
-	ny = y2-y1
-	ensdf_clean = load_bin(inp)
-	output_file = TFile.Open(outp, 'recreate')
-	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
-	for index in range(len(ensdf_clean)):
-		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
-		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
-	h2.Write()
-	output_file.Close()
+def duplicateoutstable():
+	curr_data  = []
+	for index in range(len(ensdfstable)):
+		flag_fill = True
+		for index2 in range(len(curr_data)):
+			if (ensdfstable[index]["Z"] == curr_data[index2]["Z"] and ensdfstable[index]["A"] == curr_data[index2]["A"]):
+				flag_fill = False
+		if flag_fill:
+			curr_data.append(ensdfstable[index])
+
+	return curr_data
+
+# from ROOT import TTree, TFile, TH2F
+# def writerootfile(inp,outp):
+# 	x1 = 0; x2 = 240
+# 	y1 = 0; y2 = 115
+# 	nx = x2-x1
+# 	ny = y2-y1
+# 	ensdf_clean = load_bin(inp)
+# 	output_file = TFile.Open(outp, 'recreate')
+# 	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
+# 	for index in range(len(ensdf_clean)):
+# 		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
+# 		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
+# 	h2.Write()
+# 	output_file.Close()
 
 
-# get_mult_data("list1.txt")
-# get_mult_data("list2.txt")
-# get_mult_data("list3.txt")
-# print len(ensdf)
-# ensdf_clean = duplicateout()
-# print len(ensdf_clean)
-# writebin("ensdfdata_t12.npy",ensdf_clean)
+get_mult_data("list1.txt")
+get_mult_data("list2.txt")
+get_mult_data("list3.txt")
+print len(ensdf)
+ensdf_clean = duplicateout()
+print len(ensdf_clean)
+writebin("ensdfdata_t12.npy",ensdf_clean)
+print "----"
+print len(ensdfstable)
+ensdfstable_clean = duplicateoutstable()
+print len(ensdfstable_clean)
+writebin("ensdfdata_stable_t12.npy",ensdfstable_clean)
 
-writerootfile("ensdfdata_t12.npy","halflives.root")
+#writerootfile("ensdfdata_t12.npy","halflives.root")
