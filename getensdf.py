@@ -176,9 +176,8 @@ def writerootfile(inp,outp):
 	output_file = TFile.Open(outp, 'recreate')
 	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
 	for index in range(len(ensdf_clean)):
-		if (ensdf_clean[index]["dt12p"]>0):
-			h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
-			h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
+		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
+		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
 	h2.Write()
 	output_file.Close()
 
