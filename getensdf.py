@@ -139,7 +139,7 @@ def getdata(infile):
 										dt12m= geterr(t12str,w10.strip()[w10.strip().find("-")+1:w10.strip().find("+")])
 										dt12p= geterr(t12str,w10.strip()[w10.strip().find("+")+1:])
 								#print A,Z,nuc,t12,dt12p,dt12m,t12unc_type
-								ensdf.append({"input": infile, "Z":Z, "A":A, "nuc": nuc, "t12": t12, "dt12p": dt12p, "dt12m": dt12m, "t12unctype": t12unc_type})
+								ensdf.append({"input": infile, "Z":Z, "A":A, "nuc": nuc, "t12": t12, "dt12p": dt12p, "dt12m": dt12m, "t12unit": t12unit,"t12unctype": t12unc_type})
 
 
 		
@@ -198,8 +198,8 @@ def writerootfile(inp,inpstable,outp):
 	np = 0
 	xx,yy = array('d'),array('d')
 	for index in range(len(ensdf_clean)):
-		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
-		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
+		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"]*ensdf_clean[index]["t12unit"])
+		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"]*ensdf_clean[index]["t12unit"])
 	for index in range(len(ensdfstable_clean)):
 		h2stable.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1.)
 		xx.append(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"]+0.5)
