@@ -167,10 +167,28 @@ def duplicateout():
 	return curr_data
 
 
-get_mult_data("list1.txt")
-get_mult_data("list2.txt")
-get_mult_data("list3.txt")
-print len(ensdf)
-ensdf_clean = duplicateout()
-print len(ensdf_clean)
-writebin("ensdfdata_t12.npy",ensdf_clean)
+#get_mult_data("list1.txt")
+#get_mult_data("list2.txt")
+#get_mult_data("list3.txt")
+#print len(ensdf)
+#ensdf_clean = duplicateout()
+#print len(ensdf_clean)
+#writebin("ensdfdata_t12.npy",ensdf_clean)
+from ROOT import TTree, TFile, TH2F
+def writerootfile(inp,outp):
+	
+	x1 = 0; x2 = 240
+	y1 = 0; y2 = 115
+	nx = x2-x1
+	ny = y2-y1
+	ensdf_clean = load_bin(inp)
+	output_file = TFile.Open(outp, 'recreate')
+	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
+	for index in range(len(ensdf_clean)):
+		if (ensdf_clean[index]["dt12p"]>0):
+			h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"])
+			h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
+	h2.Write()
+	output_file.Close()
+
+writerootfile("ensdfdata_t12.npy","halflives.root")
