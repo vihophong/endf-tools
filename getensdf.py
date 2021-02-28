@@ -98,7 +98,7 @@ def getdata(infile):
 				w6float = float(w6.strip())
 			except:
 				w6float = -1
-			if w6float == 0:
+			if (w6float == 0 or w6.strip() == "0.0+X" or w6.strip() == "0+X"):
 				isstable = False
 				if (w9.strip()=="STABLE"):
 					isstable = True
@@ -166,17 +166,8 @@ def duplicateout():
 
 	return curr_data
 
-
-#get_mult_data("list1.txt")
-#get_mult_data("list2.txt")
-#get_mult_data("list3.txt")
-#print len(ensdf)
-#ensdf_clean = duplicateout()
-#print len(ensdf_clean)
-#writebin("ensdfdata_t12.npy",ensdf_clean)
 from ROOT import TTree, TFile, TH2F
 def writerootfile(inp,outp):
-	
 	x1 = 0; x2 = 240
 	y1 = 0; y2 = 115
 	nx = x2-x1
@@ -190,5 +181,14 @@ def writerootfile(inp,outp):
 			h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"])
 	h2.Write()
 	output_file.Close()
+
+
+# get_mult_data("list1.txt")
+# get_mult_data("list2.txt")
+# get_mult_data("list3.txt")
+# print len(ensdf)
+# ensdf_clean = duplicateout()
+# print len(ensdf_clean)
+# writebin("ensdfdata_t12.npy",ensdf_clean)
 
 writerootfile("ensdfdata_t12.npy","halflives.root")
