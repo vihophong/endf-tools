@@ -192,8 +192,8 @@ def writerootfile(inp,inpstable,outp):
 	ensdf_clean = load_bin(inp)
 	ensdfstable_clean = load_bin(inpstable)
 	output_file = TFile.Open(outp, 'recreate')
-	h2 = TH2F("halflives","halflives",nx,x1,x2,ny,y1,y2)
-	h2stable = TH2F("stable","stable",nx,x1,x2,ny,y1,y2)
+	h2 = TH2F("halflives","",nx,x1,x2,ny,y1,y2)
+	h2stable = TH2F("stable","",nx,x1,x2,ny,y1,y2)
 
 	np = 0
 	xx,yy = array('d'),array('d')
@@ -201,6 +201,7 @@ def writerootfile(inp,inpstable,outp):
 		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"]*ensdf_clean[index]["t12unit"])
 		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"]*ensdf_clean[index]["t12unit"])
 	for index in range(len(ensdfstable_clean)):
+		h2.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1e35)
 		h2stable.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1.)
 		xx.append(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"]+0.5)
 		yy.append(ensdfstable_clean[index]["Z"]+0.5)
