@@ -183,39 +183,47 @@ def duplicateoutstable():
 
 	return curr_data
 
-from ROOT import TTree, TFile, TH2F, TGraph
-def writerootfile(inp,inpstable,outp):
-	x1 = 0; x2 = 200
-	y1 = 0; y2 = 120
-	nx = x2-x1
-	ny = y2-y1
+# from ROOT import TTree, TFile, TH2F, TGraph
+# def writerootfile(inp,inpstable,outp):
+# 	x1 = 0; x2 = 200
+# 	y1 = 0; y2 = 120
+# 	nx = x2-x1
+# 	ny = y2-y1
+# 	ensdf_clean = load_bin(inp)
+# 	ensdfstable_clean = load_bin(inpstable)
+# 	output_file = TFile.Open(outp, 'recreate')
+# 	h2 = TH2F("halflives","",nx,x1,x2,ny,y1,y2)
+# 	h2stable = TH2F("stable","",nx,x1,x2,ny,y1,y2)
+
+# 	np = 0
+# 	xx,yy = array('d'),array('d')
+# 	for index in range(len(ensdf_clean)):
+# 		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"]*ensdf_clean[index]["t12unit"])
+# 		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"]*ensdf_clean[index]["t12unit"])
+# 	for index in range(len(ensdfstable_clean)):
+# 		h2.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1e35)
+# 		h2stable.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1.)
+# 		xx.append(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"]+0.5)
+# 		yy.append(ensdfstable_clean[index]["Z"]+0.5)
+# 		np+=1
+# 	gr = TGraph(np,xx,yy)
+# 	gr.SetName("stablegr")
+# 	gr.SetMarkerStyle(21)
+# 	gr.SetMarkerColor(1)
+# 	gr.SetMarkerSize(1)
+# 	h2.Write()
+# 	h2stable.Write()
+# 	gr.Write()
+# 	output_file.Close()
+
+def writeacsii(inp,inpstable):
 	ensdf_clean = load_bin(inp)
 	ensdfstable_clean = load_bin(inpstable)
-	output_file = TFile.Open(outp, 'recreate')
-	h2 = TH2F("halflives","",nx,x1,x2,ny,y1,y2)
-	h2stable = TH2F("stable","",nx,x1,x2,ny,y1,y2)
-
-	np = 0
-	xx,yy = array('d'),array('d')
 	for index in range(len(ensdf_clean)):
-		h2.Fill(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"],ensdf_clean[index]["Z"],ensdf_clean[index]["t12"]*ensdf_clean[index]["t12unit"])
-		h2.SetBinError(ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]+1,ensdf_clean[index]["Z"]+1,ensdf_clean[index]["dt12p"]*ensdf_clean[index]["t12unit"])
+		if ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]>0:
+			print (ensdf_clean[index]["A"]-ensdf_clean[index]["Z"]),ensdf_clean[index]["Z"],ensdf_clean[index]["t12"]*ensdf_clean[index]["t12unit"],ensdf_clean[index]["dt12p"]*ensdf_clean[index]["t12unit"],ensdf_clean[index]["dt12m"]*ensdf_clean[index]["t12unit"]
 	for index in range(len(ensdfstable_clean)):
-		h2.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1e35)
-		h2stable.Fill(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"],ensdfstable_clean[index]["Z"],1.)
-		xx.append(ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"]+0.5)
-		yy.append(ensdfstable_clean[index]["Z"]+0.5)
-		np+=1
-	gr = TGraph(np,xx,yy)
-	gr.SetName("stablegr")
-	gr.SetMarkerStyle(21)
-	gr.SetMarkerColor(1)
-	gr.SetMarkerSize(1)
-	h2.Write()
-	h2stable.Write()
-	gr.Write()
-	output_file.Close()
-
+		print (ensdfstable_clean[index]["A"]-ensdfstable_clean[index]["Z"]),ensdfstable_clean[index]["Z"],1e35,0.,0.
 
 # get_mult_data("list1.txt")
 # get_mult_data("list2.txt")
@@ -230,4 +238,4 @@ def writerootfile(inp,inpstable,outp):
 # print len(ensdfstable_clean)
 # writebin("ensdfdata_stable_t12.npy",ensdfstable_clean)
 
-writerootfile("ensdfdata_t12.npy","ensdfdata_stable_t12.npy","halflives.root")
+writeacsii("ensdfdata_t12.npy","ensdfdata_stable_t12.npy")

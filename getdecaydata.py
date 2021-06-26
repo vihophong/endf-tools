@@ -160,7 +160,7 @@ def getdata(infile):
 		A = int(round(za))-Z*1000
 		endf.append({"input": infile, "Z":Z, "A":A, "za": za, "awr": awr, "lis": lis, "liso": liso, "nst": nst,
 				 "nsp": nsp,"t12": t12,"dt12": dt12,"nc": nc,"ex1": ex1,"dex1": dex1,"ex2": dex2,"ex3": dex3,
-				 "spi": spi,"par": par,"ndk": ndk,"radia": rad,"qbn": [-1,-1,-1,-1], "dqbn": [-1,-1,-1,-1],"pn": [0,0,0,0],"dpn": [0,0,0,0],
+				 "spi": spi,"par": par,"ndk": ndk,"radia": rad,"qbn": [-1,-1,-1,-1,-1], "dqbn": [-1,-1,-1,-1,-1],"pn": [0,0,0,0,0],"dpn": [0,0,0,0,0],
 				 "specs": specall})
 
 #getdata("data/decay_1565_50-Sn-134.dat")
@@ -182,27 +182,33 @@ def getneuspec(listfiles):
 					if endf[index]["lis"]==0 and endf[index]["liso"]==0:#only ground state
 						flag_bdn = False
 						for irad in range(len(endf[index]["radia"])):
-							if endf[index]["radia"][irad]["rtyp"] == 1.5:
+							if endf[index]["radia"][irad]["rtyp"] == 1.0:
 								endf[index]["qbn"][0] = endf[index]["radia"][irad]["q"]
 								endf[index]["dqbn"][0] = endf[index]["radia"][irad]["dq"]
 								endf[index]["pn"][0] = endf[index]["radia"][irad]["br"]
 								endf[index]["dpn"][0] = endf[index]["radia"][irad]["dbr"]
 								flag_bdn = True
-							if endf[index]["radia"][irad]["rtyp"] == 1.55:
+							if endf[index]["radia"][irad]["rtyp"] == 1.5:
 								endf[index]["qbn"][1] = endf[index]["radia"][irad]["q"]
 								endf[index]["dqbn"][1] = endf[index]["radia"][irad]["dq"]
 								endf[index]["pn"][1] = endf[index]["radia"][irad]["br"]
 								endf[index]["dpn"][1] = endf[index]["radia"][irad]["dbr"]
-							if endf[index]["radia"][irad]["rtyp"] == 1.555:
+								flag_bdn = True
+							if endf[index]["radia"][irad]["rtyp"] == 1.55:
 								endf[index]["qbn"][2] = endf[index]["radia"][irad]["q"]
 								endf[index]["dqbn"][2] = endf[index]["radia"][irad]["dq"]
 								endf[index]["pn"][2] = endf[index]["radia"][irad]["br"]
 								endf[index]["dpn"][2] = endf[index]["radia"][irad]["dbr"]
-							if endf[index]["radia"][irad]["rtyp"] == 1.5555:
+							if endf[index]["radia"][irad]["rtyp"] == 1.555:
 								endf[index]["qbn"][3] = endf[index]["radia"][irad]["q"]
 								endf[index]["dqbn"][3] = endf[index]["radia"][irad]["dq"]
 								endf[index]["pn"][3] = endf[index]["radia"][irad]["br"]
 								endf[index]["dpn"][3] = endf[index]["radia"][irad]["dbr"]
+							if endf[index]["radia"][irad]["rtyp"] == 1.5555:
+								endf[index]["qbn"][4] = endf[index]["radia"][irad]["q"]
+								endf[index]["dqbn"][4] = endf[index]["radia"][irad]["dq"]
+								endf[index]["pn"][4] = endf[index]["radia"][irad]["br"]
+								endf[index]["dpn"][4] = endf[index]["radia"][irad]["dbr"]
 						if flag_bdn:
 							endf_neuspecs.append(endf[index])
 	return endf_neuspecs
@@ -238,27 +244,27 @@ def getnamebyz(z):
 	return keys[values.index(z)]
 
 
-#writebin("listfiles.txt","all_beta_specs")
-endf_neuspecs = load_bin("all_beta_specs.npy")
+writebin("listfiles.txt","all_beta_specs")
+#endf_neuspecs = load_bin("all_beta_specs.npy")
 
-from ROOT import TTree, TFile, TH1F
+#from ROOT import TTree, TFile, TH1F
 
-for index in range(len(endf_neuspecs)):
-			for ip in range(len(endf_neuspecs[index]["specs"])):
-				if endf_neuspecs[index]["specs"][ip]["stype"] == "n":
-					val=np.zeros(len(endf_neuspecs[index]["specs"][ip]["spec"]))
-					dval=np.zeros(len(endf_neuspecs[index]["specs"][ip]["spec"]))
-					for ips in range(len(endf_neuspecs[index]["specs"][ip]["spec"])):
-						val[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["val"]))/1000000
-						dval[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["dval"]))
+# for index in range(len(endf_neuspecs)):
+# 			for ip in range(len(endf_neuspecs[index]["specs"])):
+# 				if endf_neuspecs[index]["specs"][ip]["stype"] == "n":
+# 					val=np.zeros(len(endf_neuspecs[index]["specs"][ip]["spec"]))
+# 					dval=np.zeros(len(endf_neuspecs[index]["specs"][ip]["spec"]))
+# 					for ips in range(len(endf_neuspecs[index]["specs"][ip]["spec"])):
+# 						val[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["val"]))/1000000
+# 						dval[ips]=(float(endf_neuspecs[index]["specs"][ip]["spec"][ips]["dval"]))
 						
-					if len(endf_neuspecs[index]["specs"][ip]["spec"])>0:
-						filename="specs/"+getnamebyz(int(endf_neuspecs[index]["Z"])).capitalize()+str(endf_neuspecs[index]["A"])+".root"
-						output_file = TFile.Open(filename, 'recreate')
-						h1 = TH1F("hSpecRebin","hSpecRebin",len(endf_neuspecs[index]["specs"][ip]["spec"])-1,val)
-						for ii in range(len(endf_neuspecs[index]["specs"][ip]["spec"])-1):
-							h1.SetBinContent(ii+1,dval[ii])
-						h1.Scale(1/h1.Integral())
-						h1.Write()
-						output_file.Close()
-						print "./neueff_from_spec.sh endf-tools/"+filename+" hSpecRebin upc_brikenV69_wClover.txt "+str(endf_neuspecs[index]["qbn"][0]/1000000)
+# 					if len(endf_neuspecs[index]["specs"][ip]["spec"])>0:
+# 						filename="specs/"+getnamebyz(int(endf_neuspecs[index]["Z"])).capitalize()+str(endf_neuspecs[index]["A"])+".root"
+# 						output_file = TFile.Open(filename, 'recreate')
+# 						h1 = TH1F("hSpecRebin","hSpecRebin",len(endf_neuspecs[index]["specs"][ip]["spec"])-1,val)
+# 						for ii in range(len(endf_neuspecs[index]["specs"][ip]["spec"])-1):
+# 							h1.SetBinContent(ii+1,dval[ii])
+# 						h1.Scale(1/h1.Integral())
+# 						h1.Write()
+# 						output_file.Close()
+# 						print "./neueff_from_spec.sh endf-tools/"+filename+" hSpecRebin upc_brikenV69_wClover.txt "+str(endf_neuspecs[index]["qbn"][1]/1000000)
