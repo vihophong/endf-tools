@@ -267,4 +267,4 @@ for index in range(len(endf_neuspecs)):
 						h1.Scale(1/h1.Integral())
 						h1.Write()
 						output_file.Close()
-						print "./neueff_from_spec.sh endf-tools/"+filename+" hSpecRebin upc_brikenV69_wClover.txt "+str(endf_neuspecs[index]["qbn"][1]/1000000)
+						print "./neueff_from_spec.sh endf-tools/"+filename+" hSpecRebin upc_brikenV69_wClover.txt "+str(endf_neuspecs[index]["qbn"][1]/1000000)+" "+str(endf_neuspecs[index]["qbn"][0]/1000000)
